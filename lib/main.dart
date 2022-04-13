@@ -357,7 +357,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 children: [
                   Icon(Icons.arrow_back_ios_new, color: Colors.white.withOpacity(0.3),),
                   Icon(Icons.arrow_back_ios_new, color: Colors.white.withOpacity(0.3),),
-                  Text("Swipe left to scan", style: TextStyle(fontSize: 25, color: Colors.white.withOpacity(0.3)),)
+                  Text("Swipe left to repeat speech", style: TextStyle(fontSize: 25, color: Colors.white.withOpacity(0.3)),)
                 ],
               ),
               Padding(
@@ -367,7 +367,7 @@ class _MyHomePageState extends State<MyHomePage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Swipe right to close", style: TextStyle(fontSize: 25, color: Colors.white.withOpacity(0.3)),),
+                  Text("Swipe left to scan", style: TextStyle(fontSize: 25, color: Colors.white.withOpacity(0.3)),),
                   Icon(Icons.arrow_forward_ios, color: Colors.white.withOpacity(0.3),),
                   Icon(Icons.arrow_forward_ios, color: Colors.white.withOpacity(0.3),)
                 ],
