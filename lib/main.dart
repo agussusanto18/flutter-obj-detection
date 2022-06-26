@@ -1,16 +1,21 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shake/shake.dart';
 import 'package:tflite/tflite.dart';
-import 'package:image_picker/image_picker.dart';
+// import 'package:image_picker/image_picker.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-
 
 const String ssd = "SSD MobileNet";
 const String yolo = "Tiny YOLOv2";
 
 List<CameraDescription> cameras;
+
+enum PageName {
+  home,
+  result
+}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,6 +27,11 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: MyHomePage(),
@@ -49,12 +59,31 @@ class _MyHomePageState extends State<MyHomePage> {
   bool selection = false;
   bool visible = false;
   String detectedClass = "";
+  PageName pageName = PageName.home;
+
 
   @override
   void initState() {
     super.initState();
     loadModel();
     initCamera();
+
+    ShakeDetector detector = ShakeDetector.autoStart(
+      onPhoneShake: () {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Shake!')));
+
+        if(pageName == PageName.home) {
+          speak("Please point your camera at the target code");
+        } else if (pageName == PageName.result) {
+          speak("Swipe left to repeat, and swipe right to detect");
+        }
+      },
+      minimumShakeCount: 3,
+      shakeSlopTimeMS: 500,
+      shakeCountResetTime: 3000,
+      shakeThresholdGravity: 2.7,
+    );
   }
 
   @override
@@ -192,10 +221,11 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       setState(() {
         visible = true;
+        pageName = PageName.result;
         controller.pausePreview();
         speak(detectedClass.toString());
       });
-    } catch(e) {
+    } catch (e) {
       print(e);
     }
   }
@@ -203,11 +233,12 @@ class _MyHomePageState extends State<MyHomePage> {
   void hideBackdrop() {
     setState(() {
       visible = false;
+      pageName = PageName.home;
       controller.resumePreview();
     });
   }
 
-  Future speak(String obj) async{
+  Future speak(String obj) async {
     await tts.setLanguage("en-US");
     await tts.speak("This is pattern " + obj);
   }
@@ -219,7 +250,6 @@ class _MyHomePageState extends State<MyHomePage> {
     double factorY = _imageHeight; // _imageWidth * screen.width;
     Color blue = Color.fromRGBO(37, 213, 253, 1.0);
     return _recognitions.map((re) {
-
       if (re["confidenceInClass"] * 100 > 50) {
         setState(() {
           detectedClass = re["detectedClass"];
@@ -315,68 +345,98 @@ class _MyHomePageState extends State<MyHomePage> {
     //   ),
     // );
 
-    stackChildren.add(
-      Positioned(
-      top: 0.0,
-      left: 0.0,
-      width: size.width,
-      height: size.height,
-      child: Visibility(
-        visible: visible,
-        child:
-        GestureDetector(
-        onHorizontalDragUpdate: (details) {  
-            int sensitivity = 10;
-            if (details.delta.dx > sensitivity) {
-                // Right Swipe
-              hideBackdrop();
-            } else if(details.delta.dx < -sensitivity){
-                //Left Swipe
-              speak(detectedClass);
-            }
-        },
-        child: Container(
-          color: Colors.black.withOpacity(0.6),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(30),
-                child: Container(
-                  width: 70,
-                  height: 70,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white.withOpacity(0.3)),
-                    borderRadius: BorderRadius.circular(50)
-                  ),
-                  child: Center(child: Text(detectedClass, style: TextStyle(fontSize: 30, color: Colors.white.withOpacity(0.3)),),),
+    stackChildren.add(Positioned(
+        top: 0.0,
+        left: 0.0,
+        width: size.width,
+        height: size.height,
+        child: Visibility(
+            visible: visible,
+            child: GestureDetector(
+              onHorizontalDragUpdate: (details) {
+                int sensitivity = 10;
+                if (details.delta.dx > sensitivity) {
+                  // Right Swipe
+                  hideBackdrop();
+                } else if (details.delta.dx < -sensitivity) {
+                  //Left Swipe
+                  speak(detectedClass);
+                }
+              },
+              child: Container(
+                color: Colors.black.withOpacity(0.6),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(30),
+                      child: Container(
+                        width: 70,
+                        height: 70,
+                        decoration: BoxDecoration(
+                            border: Border.all(
+                                color: Colors.white.withOpacity(0.3)),
+                            borderRadius: BorderRadius.circular(50)),
+                        child: Center(
+                          child: Text(
+                            detectedClass,
+                            style: TextStyle(
+                                fontSize: 30,
+                                color: Colors.white.withOpacity(0.3)),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.arrow_back_ios_new,
+                          color: Colors.white.withOpacity(0.3),
+                        ),
+                        Icon(
+                          Icons.arrow_back_ios_new,
+                          color: Colors.white.withOpacity(0.3),
+                        ),
+                        Text(
+                          "Swipe left to repeat speech",
+                          style: TextStyle(
+                              fontSize: 25,
+                              color: Colors.white.withOpacity(0.3)),
+                        )
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Text(
+                        "Or",
+                        style: TextStyle(
+                            fontSize: 25, color: Colors.white.withOpacity(0.3)),
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Swipe left to scan",
+                          style: TextStyle(
+                              fontSize: 25,
+                              color: Colors.white.withOpacity(0.3)),
+                        ),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          color: Colors.white.withOpacity(0.3),
+                        ),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          color: Colors.white.withOpacity(0.3),
+                        )
+                      ],
+                    ),
+                  ],
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.arrow_back_ios_new, color: Colors.white.withOpacity(0.3),),
-                  Icon(Icons.arrow_back_ios_new, color: Colors.white.withOpacity(0.3),),
-                  Text("Swipe left to repeat speech", style: TextStyle(fontSize: 25, color: Colors.white.withOpacity(0.3)),)
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Text("Or", style: TextStyle(fontSize: 25, color: Colors.white.withOpacity(0.3)),),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("Swipe left to scan", style: TextStyle(fontSize: 25, color: Colors.white.withOpacity(0.3)),),
-                  Icon(Icons.arrow_forward_ios, color: Colors.white.withOpacity(0.3),),
-                  Icon(Icons.arrow_forward_ios, color: Colors.white.withOpacity(0.3),)
-                ],
-              ),
-            ],
-          ),
-    ),))
-      )
-       );
+            ))));
 
     return SafeArea(
       child: Scaffold(
