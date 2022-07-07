@@ -1,0 +1,4 @@
+enum PageName {
+  home,
+  result
+}

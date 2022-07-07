@@ -35,6 +35,9 @@ dependencies:
   flutter_tts: ^3.3.3
   tflite: ^1.1.2
   shake: ^2.1.0
+  vibration: ^1.7.3
+  http: ^0.13.4
+  shared_preferences: ^2.0.15
 
 
   # The following adds the Cupertino Icons font to your application.
