@@ -6,6 +6,8 @@ import 'package:obj_detection/pages/Home.dart';
 import 'dart:convert';
 import 'package:obj_detection/pages/Signup.dart';
 import 'package:http/http.dart' as http;
+import 'package:obj_detection/utils/ApiServices.dart';
+import 'package:obj_detection/utils/functions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
@@ -15,6 +17,7 @@ class SigninPage extends StatefulWidget {
 }
 
 class _SigninState extends State<SigninPage> {
+  ApiServices apiServices;
   TextEditingController username = TextEditingController();
   TextEditingController password = TextEditingController();
   bool isLoading = false;
@@ -22,6 +25,8 @@ class _SigninState extends State<SigninPage> {
   @override
   void initState() {
     super.initState();
+    apiServices = ApiServices();
+
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp
     ]);
@@ -32,20 +37,13 @@ class _SigninState extends State<SigninPage> {
       isLoading = true;
     });
 
-    var url = Uri.parse("http://braille.api.tenji.id/signin.php");
-    var response = await http.post(url, body: {
-      "name": username.text,
-      "password": password.text
-    });
-
-    var data = json.decode(response.body);
-    if(!data['error']) {
+    await apiServices.login(username.text, password.text, onSuccess: (data){
+      int userId = int.parse(data["data"]["user"]["id"]);
       // set sessions
-      setSession(data["data"]["user"]["id"]);
-      // show message
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Login is successful"), backgroundColor: Colors.greenAccent,));
+      setSession(userId);
 
+      // show message
+      showSnackBar(context, "Login is successful", Colors.greenAccent);
       // Timing redirect to home page
       Timer(Duration(seconds: 2), (){
         Navigator.push(
@@ -54,10 +52,9 @@ class _SigninState extends State<SigninPage> {
               builder: (context) => MyHomePage()),
         );
       });
-    } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(data['error_msg']), backgroundColor: Colors.redAccent,));
-    }
+    }, onError: (message){
+      showSnackBar(context, message, Colors.redAccent);
+    });
 
     setState((){
       isLoading = false;

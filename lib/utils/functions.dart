@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:tflite/tflite.dart';
 import 'package:obj_detection/utils/constants.dart';
 import 'package:vibration/vibration.dart';
@@ -41,4 +42,15 @@ Future<void> showVibration(BuildContext context) async {
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text('Not Vibrate!')));
   }
+}
+
+void showSnackBar(BuildContext context, String message, Color colors){
+  ScaffoldMessenger.of(context)
+      .showSnackBar(SnackBar(content: Text(message), backgroundColor: colors,));
+}
+
+String getCurrentDateStr() {
+  var now = DateTime.now();
+  var formater = DateFormat('yyyy-MM-dd hh:mm:ss');
+  return formater.format(now);
 }

@@ -2,8 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:obj_detection/pages/Signin.dart';
 import 'package:http/http.dart' as http;
+import 'package:obj_detection/utils/functions.dart';
+import 'package:obj_detection/utils/ApiServices.dart';
 
 
 class SignupPage extends StatefulWidget {
@@ -16,38 +19,38 @@ class _SignupState extends State<SignupPage> {
   TextEditingController username = TextEditingController();
   TextEditingController password = TextEditingController();
   TextEditingController email = TextEditingController();
+  ApiServices apiServices;
+
+  @override
+  void initState() {
+    super.initState();
+    apiServices = ApiServices();
+
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp
+    ]);
+  }
 
   Future register() async{
     setState((){
       isLoading = true;
     });
 
-    var url = Uri.parse("http://braille.api.tenji.id/signup.php");
-    var response = await http.post(url, body: {
-      "name": username.text,
-      "password": password.text,
-      "email": email.text
+    await apiServices.register(username.text, email.text, password.text, onSuccess: (data){
+        clearFields();
+        // show message
+        showSnackBar(context, "registration is successful, please login to continue", Colors.greenAccent);
+        // Timing redirect to signin page
+        Timer(Duration(seconds: 3), (){
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => SigninPage()),
+          );
+        });
+    }, onError: (message){
+      showSnackBar(context, message, Colors.redAccent);
     });
-
-    var data = json.decode(response.body);
-    if(!data['error']) {
-      clearFields();
-      // show message
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("registration is successful, please login to continue"), backgroundColor: Colors.greenAccent,));
-
-      // Timing redirect to signin page
-      Timer(Duration(seconds: 3), (){
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => SigninPage()),
-        );
-      });
-    } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(data['error_msg']), backgroundColor: Colors.redAccent,));
-    }
 
     setState((){
       isLoading = false;

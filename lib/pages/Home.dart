@@ -5,10 +5,13 @@ import 'package:obj_detection/enums.dart';
 import 'package:obj_detection/utils/constants.dart';
 import 'package:obj_detection/utils/functions.dart';
 import 'package:shake/shake.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tflite/tflite.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:vibration/vibration.dart';
+
+import '../utils/ApiServices.dart';
 
 
 class MyHomePage extends StatefulWidget {
@@ -36,11 +39,14 @@ class _MyHomePageState extends State<MyHomePage> {
   PageName pageName = PageName.home;
   bool topConfirm = false;
   bool bottomConfirm = false;
+  ApiServices apiServices;
+  bool isLoading = false;
 
 
   @override
   void initState() {
     super.initState();
+    apiServices = ApiServices();
 
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
@@ -187,6 +193,8 @@ class _MyHomePageState extends State<MyHomePage> {
     } catch (e) {
       print(e);
     }
+
+    countCapture(detectedClass.toString());
   }
 
   void hideBackdrop() {
@@ -195,6 +203,28 @@ class _MyHomePageState extends State<MyHomePage> {
       topConfirm = false;
       pageName = PageName.home;
       controller.resumePreview();
+    });
+  }
+
+  Future countCapture(String result) async{
+    final preferences = await SharedPreferences.getInstance();
+    int userId = preferences.getInt("userId");
+    await apiServices.capture(result, userId.toString(), onSuccess: (data){}, onError: (message){
+      showSnackBar(context, "Failed to record capture", Colors.redAccent);
+    });
+  }
+
+  Future countAction(String type) async{
+    setState(() {
+      isLoading = true;
+    });
+    final preferences = await SharedPreferences.getInstance();
+    int userId = preferences.getInt("userId");
+    await apiServices.count(type, userId.toString(), onSuccess: (data){}, onError: (message){
+      showSnackBar(context, "Failed to count action", Colors.redAccent);
+    });
+    setState(() {
+      isLoading = false;
     });
   }
 
@@ -246,8 +276,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    var screenHeight = MediaQuery.of(context).size.height;
+    var screenWidth = MediaQuery.of(context).size.width;
+
     Size size = MediaQuery.of(context).size;
     List<Widget> stackChildren = [];
+
     stackChildren.add(Positioned(
         top: 0.0,
         left: 0.0,
@@ -319,9 +353,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 if (details.delta.dx > sensitivity) {
                   // Right Swipe
                   hideBackdrop();
+                  countAction("swipe_right");
                 } else if (details.delta.dx < -sensitivity) {
                   //Left Swipe
                   speak(detectedClass);
+                  countAction("swipe_left");
                 }
               },
               onVerticalDragUpdate: (details) {
@@ -341,6 +377,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       });
                     });
                   }
+
+                  countAction("swipe_bottom");
                 } else if(details.delta.dy < -sensitivity){
                   // Top swipe
                   if (topConfirm) {
@@ -352,6 +390,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       });
                     });
                   }
+
+                  countAction("swipe_top");
                 }
               },
               child: Container(
@@ -450,6 +490,23 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ))));
+
+    stackChildren.add(Positioned(
+        child: (isLoading) ? Container(
+          width: screenWidth,
+          height: screenHeight,
+          color: Colors.black.withOpacity(0.5),
+          child: Center(
+            child: Container(
+              width: 50,
+              height: 50,
+              child: CircularProgressIndicator(
+                color: Colors.grey,
+                strokeWidth: 5,
+              ),
+            ),
+          ),
+        ) : Container()));
 
     return SafeArea(
       child: Scaffold(
