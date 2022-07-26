@@ -22,7 +22,7 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
   final FlutterTts tts = FlutterTts();
   List<CameraDescription> cameras;
   List _recognitions;
@@ -41,12 +41,14 @@ class _MyHomePageState extends State<MyHomePage> {
   bool bottomConfirm = false;
   ApiServices apiServices;
   bool isLoading = false;
+  String startDateTime;
 
 
   @override
   void initState() {
     super.initState();
     apiServices = ApiServices();
+    startDateTime = getCurrentDateStr();
 
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
@@ -72,6 +74,19 @@ class _MyHomePageState extends State<MyHomePage> {
       shakeCountResetTime: 3000,
       shakeThresholdGravity: 2.7,
     );
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if(state == AppLifecycleState.inactive){
+      recordDuration();
+    } else if (state == AppLifecycleState.resumed) {
+      setState((){
+        startDateTime = getCurrentDateStr();
+      });
+    }
   }
 
   @override
@@ -182,12 +197,22 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  Future recordDuration() async{
+    final preferences = await SharedPreferences.getInstance();
+    int userId = preferences.getInt("userId");
+
+    await apiServices.duration(startDateTime, getCurrentDateStr(), "Result",  userId.toString(), onSuccess: (data){}, onError: (message){
+      showSnackBar(context, "Failed to record duration", Colors.redAccent);
+    });
+  }
+
   void showBackdrop(String detectedClass) {
     try {
       setState(() {
         visible = true;
         pageName = PageName.result;
         controller.pausePreview();
+        startDateTime = getCurrentDateStr();
         speak(detectedClass.toString());
       });
     } catch (e) {
@@ -198,6 +223,10 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void hideBackdrop() {
+    if(visible) {
+      recordDuration();
+    }
+
     setState(() {
       visible = false;
       topConfirm = false;
@@ -301,45 +330,6 @@ class _MyHomePageState extends State<MyHomePage> {
       stackChildren.addAll(renderBoxes(size));
     }
 
-    // stackChildren.add(
-    //   Container(
-    //     height: size.height,
-    //     alignment: Alignment.bottomCenter,
-    //     child: Container(
-    //       color: Colors.white,
-    //       child: Row(
-    //         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-    //         children: [
-    //           Text('SSD'),
-    //           Switch(
-    //             value: selection,
-    //             onChanged: (value) {
-    //               setState(() {
-    //                 selection = value;
-    //                 if (value) {
-    //                   _model = yolo;
-    //                   controller.stopImageStream();
-    //                   //controller.dispose();
-    //                   print(isBusy);
-    //                   loadModel();
-    //                   initCamera();
-    //                 } else {
-    //                   _model = ssd;
-    //                   controller.stopImageStream();
-    //                   controller.dispose();
-    //                   loadModel();
-    //                   initCamera();
-    //                 }
-    //               });
-    //             },
-    //           ),
-    //           Text('Yolo'),
-    //         ],
-    //       ),
-    //     ),
-    //   ),
-    // );
-
     stackChildren.add(Positioned(
         top: 0.0,
         left: 0.0,
@@ -349,19 +339,21 @@ class _MyHomePageState extends State<MyHomePage> {
             visible: visible,
             child: GestureDetector(
               onHorizontalDragUpdate: (details) {
-                int sensitivity = 10;
+                int sensitivity = 8;
                 if (details.delta.dx > sensitivity) {
                   // Right Swipe
                   hideBackdrop();
                   countAction("swipe_right");
+                  print("right *******************************");
                 } else if (details.delta.dx < -sensitivity) {
                   //Left Swipe
                   speak(detectedClass);
                   countAction("swipe_left");
+                  print("left *******************************");
                 }
               },
               onVerticalDragUpdate: (details) {
-                int sensitivity = 10;
+                int sensitivity = 8;
                 if (details.delta.dy > sensitivity) {
                   // Bottom swipe
                   if(bottomConfirm) {
@@ -390,6 +382,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       });
                     });
                   }
+
 
                   countAction("swipe_top");
                 }
