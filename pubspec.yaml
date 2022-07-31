@@ -39,6 +39,7 @@ dependencies:
   http: ^0.13.4
   shared_preferences: ^2.0.15
   intl: ^0.17.0
+  swipedetector: ^1.2.0
 
 
   # The following adds the Cupertino Icons font to your application.

@@ -6,6 +6,7 @@ import 'package:obj_detection/utils/constants.dart';
 import 'package:obj_detection/utils/functions.dart';
 import 'package:shake/shake.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:swipedetector/swipedetector.dart';
 import 'package:tflite/tflite.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -42,6 +43,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
   ApiServices apiServices;
   bool isLoading = false;
   String startDateTime;
+  bool swipeStatus = false;
 
 
   @override
@@ -337,55 +339,46 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
         height: size.height,
         child: Visibility(
             visible: visible,
-            child: GestureDetector(
-              onHorizontalDragUpdate: (details) {
-                int sensitivity = 8;
-                if (details.delta.dx > sensitivity) {
-                  // Right Swipe
+            child: SwipeDetector(
+              onSwipeUp: () {
+                if (topConfirm) {
                   hideBackdrop();
-                  countAction("swipe_right");
-                  print("right *******************************");
-                } else if (details.delta.dx < -sensitivity) {
-                  //Left Swipe
+                } else {
+                  speak("are you sure you answered correctly? if yes, please swipe up again").then((val) {
+                    setState(() {
+                      topConfirm = true;
+                    });
+                  });
+                }
+                countAction("swipe_top");
+              },
+              onSwipeDown: () {
+                if(bottomConfirm) {
+                  speak("please wait, we will provide material recommendations").then((val) {
+                    setState(() {
+                      bottomConfirm = false;
+                    });
+                  });
+                } else {
+                  speak("did you answer wrong? swipe down again to confirm").then((val) {
+                    setState(() {
+                      bottomConfirm = true;
+                    });
+                  });
+                }
+                countAction("swipe_bottom");
+              },
+              onSwipeLeft: () {
+                setState(() {
                   speak(detectedClass);
                   countAction("swipe_left");
-                  print("left *******************************");
-                }
+                });
               },
-              onVerticalDragUpdate: (details) {
-                int sensitivity = 8;
-                if (details.delta.dy > sensitivity) {
-                  // Bottom swipe
-                  if(bottomConfirm) {
-                    speak("please wait, we will provide material recommendations").then((val) {
-                      setState(() {
-                        bottomConfirm = false;
-                      });
-                    });
-                  } else {
-                    speak("did you answer wrong? swipe down again to confirm").then((val) {
-                      setState(() {
-                        bottomConfirm = true;
-                      });
-                    });
-                  }
-
-                  countAction("swipe_bottom");
-                } else if(details.delta.dy < -sensitivity){
-                  // Top swipe
-                  if (topConfirm) {
-                    hideBackdrop();
-                  } else {
-                    speak("are you sure you answered correctly? if yes, please swipe up again").then((val) {
-                      setState(() {
-                        topConfirm = true;
-                      });
-                    });
-                  }
-
-
-                  countAction("swipe_top");
-                }
+              onSwipeRight: () {
+                setState(() {
+                  hideBackdrop();
+                  countAction("swipe_right");
+                });
               },
               child: Container(
                 color: Colors.black.withOpacity(0.6),
@@ -483,6 +476,167 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
                 ),
               ),
             ))));
+
+
+    //
+    // stackChildren.add(Positioned(
+    //     top: 0.0,
+    //     left: 0.0,
+    //     width: size.width,
+    //     height: size.height,
+    //     child: Visibility(
+    //         visible: visible,
+    //         child: GestureDetector(
+    //           onHorizontalDragUpdate: (details) {
+    //             int sensitivity = 10;
+    //             if (details.delta.dx > sensitivity) {
+    //               // // Right Swipe
+    //               // hideBackdrop();
+    //               // countAction("swipe_right");
+    //               print(details.delta.dx);
+    //               print("right *******************************");
+    //             } else if (details.delta.dx < -sensitivity) {
+    //               //Left Swipe
+    //               swipeStatus = true;
+    //               if (swipeStatus == true) {
+    //                 speak(detectedClass);
+    //                 countAction("swipe_left");
+    //                 print("left *******************************");
+    //                 swipeStatus = true;
+    //               }
+    //             }
+    //           },
+    //           onVerticalDragUpdate: (details) {
+    //             int sensitivity = 8;
+    //             if (details.delta.dy > sensitivity) {
+    //               // Bottom swipe
+    //               if(bottomConfirm) {
+    //                 speak("please wait, we will provide material recommendations").then((val) {
+    //                   setState(() {
+    //                     bottomConfirm = false;
+    //                   });
+    //                 });
+    //               } else {
+    //                 speak("did you answer wrong? swipe down again to confirm").then((val) {
+    //                   setState(() {
+    //                     bottomConfirm = true;
+    //                   });
+    //                 });
+    //               }
+    //
+    //               countAction("swipe_bottom");
+    //             } else if(details.delta.dy < -sensitivity){
+    //               // Top swipe
+    //               if (topConfirm) {
+    //                 hideBackdrop();
+    //               } else {
+    //                 speak("are you sure you answered correctly? if yes, please swipe up again").then((val) {
+    //                   setState(() {
+    //                     topConfirm = true;
+    //                   });
+    //                 });
+    //               }
+    //
+    //
+    //               countAction("swipe_top");
+    //             }
+    //           },
+    //           child: Container(
+    //             color: Colors.black.withOpacity(0.6),
+    //             child: Column(
+    //               mainAxisAlignment: MainAxisAlignment.center,
+    //               children: [
+    //                 Padding(
+    //                   padding: const EdgeInsets.all(30),
+    //                   child: Container(
+    //                     width: 70,
+    //                     height: 70,
+    //                     decoration: BoxDecoration(
+    //                         border: Border.all(
+    //                             color: Colors.white.withOpacity(0.3)),
+    //                         borderRadius: BorderRadius.circular(50)),
+    //                     child: Center(
+    //                       child: Text(
+    //                         detectedClass,
+    //                         style: TextStyle(
+    //                             fontSize: 30,
+    //                             color: Colors.white.withOpacity(0.3)),
+    //                       ),
+    //                     ),
+    //                   ),
+    //                 ),
+    //                 Row(
+    //                   mainAxisAlignment: MainAxisAlignment.center,
+    //                   children: [
+    //                     Icon(
+    //                       Icons.arrow_upward,
+    //                       color: Colors.white.withOpacity(0.3),
+    //                       size: 35,
+    //                     ),
+    //                     Padding(padding: EdgeInsets.only(right: 15)),
+    //                     Text(
+    //                       "Swipe up to answer correctly",
+    //                       style: TextStyle(
+    //                           fontSize: 25,
+    //                           color: Colors.white.withOpacity(0.3)),
+    //                     )
+    //                   ],
+    //                 ),
+    //                 Row(
+    //                   mainAxisAlignment: MainAxisAlignment.center,
+    //                   children: [
+    //                     Icon(
+    //                       Icons.arrow_downward,
+    //                       color: Colors.white.withOpacity(0.3),
+    //                       size: 35,
+    //                     ),
+    //                     Padding(padding: EdgeInsets.only(right: 15)),
+    //                     Text(
+    //                       "Swipe down to answer wrong",
+    //                       style: TextStyle(
+    //                           fontSize: 25,
+    //                           color: Colors.white.withOpacity(0.3)),
+    //                     )
+    //                   ],
+    //                 ),
+    //                 Row(
+    //                   mainAxisAlignment: MainAxisAlignment.center,
+    //                   children: [
+    //                     Icon(
+    //                       Icons.arrow_back,
+    //                       color: Colors.white.withOpacity(0.3),
+    //                       size: 35,
+    //                     ),
+    //                     Padding(padding: EdgeInsets.only(right: 15)),
+    //                     Text(
+    //                       "Swipe left to repeat speech",
+    //                       style: TextStyle(
+    //                           fontSize: 25,
+    //                           color: Colors.white.withOpacity(0.3)),
+    //                     )
+    //                   ],
+    //                 ),
+    //                 Row(
+    //                   mainAxisAlignment: MainAxisAlignment.center,
+    //                   children: [
+    //                     Icon(
+    //                       Icons.arrow_forward,
+    //                       color: Colors.white.withOpacity(0.3),
+    //                       size: 35,
+    //                     ),
+    //                     Padding(padding: EdgeInsets.only(right: 15)),
+    //                     Text(
+    //                       "Swipe right to scan",
+    //                       style: TextStyle(
+    //                           fontSize: 25,
+    //                           color: Colors.white.withOpacity(0.3)),
+    //                     )
+    //                   ],
+    //                 ),
+    //               ],
+    //             ),
+    //           ),
+    //         ))));
 
     stackChildren.add(Positioned(
         child: (isLoading) ? Container(
