@@ -39,8 +39,9 @@ class _SigninState extends State<SigninPage> {
 
     await apiServices.login(username.text, password.text, onSuccess: (data){
       int userId = int.parse(data["data"]["user"]["id"]);
+      String userName = data["data"]["user"]["name"];
       // set sessions
-      setSession(userId);
+      setSession(userId, userName);
 
       // show message
       showSnackBar(context, "Login is successful", Colors.greenAccent);
@@ -61,10 +62,11 @@ class _SigninState extends State<SigninPage> {
     });
   }
 
-  setSession(int userId) async {
+  setSession(int userId, String userName) async {
     final preferences = await SharedPreferences.getInstance();
     await preferences.setBool("login", true);
     await preferences.setInt("userId", userId);
+    await preferences.setString("userName", userName);
   }
 
   @override
