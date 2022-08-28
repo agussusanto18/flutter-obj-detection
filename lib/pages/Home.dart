@@ -19,7 +19,6 @@ import 'package:vibration/vibration.dart';
 
 import '../utils/ApiServices.dart';
 
-
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
   final String title;
@@ -28,7 +27,7 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   final FlutterTts tts = FlutterTts();
   List<CameraDescription> cameras;
   List _recognitions;
@@ -50,7 +49,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
   String startDateTime;
   bool swipeStatus = false;
   String usernameStr = "";
-
 
   @override
   void initState() {
@@ -76,13 +74,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
     String username = preferences.getString("userName") ?? "user";
     bool homeFirstStart = preferences.getBool("homeFirstStart") ?? true;
 
-    setState((){
+    setState(() {
       usernameStr = username;
     });
 
-    Timer(const Duration(seconds: 2), (){
-      if(homeFirstStart) {
-        speak(SpeechText.home4shake(username)).then((e){
+    Timer(const Duration(seconds: 2), () {
+      if (homeFirstStart) {
+        speak(SpeechText.home4shake(username)).then((e) {
           preferences.setBool("homeFirstStart", false);
         });
       }
@@ -93,7 +91,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Shake!')));
 
-        if(pageName == PageName.home) {
+        if (pageName == PageName.home) {
           speak(SpeechText.home2shake());
         } else if (pageName == PageName.result) {
           speak(SpeechText.result2shake(username));
@@ -110,10 +108,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
 
-    if(state == AppLifecycleState.inactive){
+    if (state == AppLifecycleState.inactive) {
       recordDuration();
     } else if (state == AppLifecycleState.resumed) {
-      setState((){
+      setState(() {
         startDateTime = getCurrentDateStr();
       });
     }
@@ -137,8 +135,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
       }
       setState(() {
         controller.startImageStream((image) => {
-          if (!isBusy) {isBusy = true, img = image, runModelOnFrame()}
-        });
+              if (!isBusy) {isBusy = true, img = image, runModelOnFrame()}
+            });
       });
     });
   }
@@ -227,11 +225,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
     }
   }
 
-  Future recordDuration() async{
+  Future recordDuration() async {
     final preferences = await SharedPreferences.getInstance();
     int userId = preferences.getInt("userId");
 
-    await apiServices.duration(startDateTime, getCurrentDateStr(), "Result",  userId.toString(), onSuccess: (data){}, onError: (message){
+    await apiServices.duration(
+        startDateTime, getCurrentDateStr(), "Result", userId.toString(),
+        onSuccess: (data) {}, onError: (message) {
       showSnackBar(context, "Failed to record duration", Colors.redAccent);
     });
   }
@@ -241,12 +241,12 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
     String username = preferences.getString("userName") ?? "user";
     bool resultFirstStart = preferences.getBool("resultFirstStart") ?? true;
 
-    if(resultFirstStart) {
+    if (resultFirstStart) {
       speak(SpeechText.result4shake(username)).then((value) {
         preferences.setBool("resultFirstStart", false);
       });
     }
-    
+
     try {
       setState(() {
         visible = true;
@@ -263,7 +263,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
   }
 
   void hideBackdrop() {
-    if(visible) {
+    if (visible) {
       recordDuration();
     }
 
@@ -275,21 +275,23 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
     });
   }
 
-  Future countCapture(String result) async{
+  Future countCapture(String result) async {
     final preferences = await SharedPreferences.getInstance();
     int userId = preferences.getInt("userId");
-    await apiServices.capture(result, userId.toString(), onSuccess: (data){}, onError: (message){
+    await apiServices.capture(result, userId.toString(), onSuccess: (data) {},
+        onError: (message) {
       showSnackBar(context, "Failed to record capture", Colors.redAccent);
     });
   }
 
-  Future countAction(String type) async{
+  Future countAction(String type) async {
     setState(() {
       isLoading = true;
     });
     final preferences = await SharedPreferences.getInstance();
     int userId = preferences.getInt("userId");
-    await apiServices.count(type, userId.toString(), onSuccess: (data){}, onError: (message){
+    await apiServices.count(type, userId.toString(), onSuccess: (data) {},
+        onError: (message) {
       showSnackBar(context, "Failed to count action", Colors.redAccent);
     });
     setState(() {
@@ -361,9 +363,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
           child: (!controller.value.isInitialized)
               ? new Container()
               : AspectRatio(
-            aspectRatio: controller.value.aspectRatio,
-            child: CameraPreview(controller),
-          ),
+                  aspectRatio: controller.value.aspectRatio,
+                  child: CameraPreview(controller),
+                ),
         )));
 
     if (img != null) {
@@ -381,8 +383,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
               onSwipeUp: () {
                 if (topConfirm) {
                   hideBackdrop();
+                  speak("Thank you");
                 } else {
-                  speak("are you sure you answered correctly? if yes, please swipe up again").then((val) {
+                  speak("are you sure you answered correctly? if yes, please swipe up again")
+                      .then((val) {
                     setState(() {
                       topConfirm = true;
                     });
@@ -391,14 +395,16 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
                 countAction("swipe_top");
               },
               onSwipeDown: () {
-                if(bottomConfirm) {
-                  speak("please wait, we will provide material recommendations").then((val) {
+                if (bottomConfirm) {
+                  speak("please wait, we will provide material recommendations")
+                      .then((val) {
                     setState(() {
                       bottomConfirm = false;
                     });
                   });
                 } else {
-                  speak("did you answer wrong? swipe down again to confirm").then((val) {
+                  speak("did you answer wrong? swipe down again to confirm")
+                      .then((val) {
                     setState(() {
                       bottomConfirm = true;
                     });
@@ -442,39 +448,47 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver{
                         ),
                       ),
                     ),
-                    const ResultText(text: "Swipe up to answer correctly", icon: Icons.arrow_upward),
-                    const ResultText(text: "Swipe down to answer wrong", icon: Icons.arrow_downward),
-                    const ResultText(text: "Swipe left to repeat speech", icon: Icons.arrow_back),
-                    const ResultText(text: "Swipe right to scan", icon: Icons.arrow_forward),
+                    const ResultText(
+                        text: "Swipe up to answer correctly",
+                        icon: Icons.arrow_upward),
+                    const ResultText(
+                        text: "Swipe down to answer wrong",
+                        icon: Icons.arrow_downward),
+                    const ResultText(
+                        text: "Swipe left to repeat speech",
+                        icon: Icons.arrow_back),
+                    const ResultText(
+                        text: "Swipe right to scan", icon: Icons.arrow_forward),
                   ],
                 ),
               ),
             ))));
 
-
     stackChildren.add(Positioned(
-        child: (isLoading) ? Container(
-          width: screenWidth,
-          height: screenHeight,
-          color: Colors.black.withOpacity(0.5),
-          child: Center(
-            child: Container(
-              width: 50,
-              height: 50,
-              child: CircularProgressIndicator(
-                color: Colors.grey,
-                strokeWidth: 5,
-              ),
-            ),
-          ),
-        ) : Container()));
+        child: (isLoading)
+            ? Container(
+                width: screenWidth,
+                height: screenHeight,
+                color: Colors.black.withOpacity(0.5),
+                child: Center(
+                  child: Container(
+                    width: 50,
+                    height: 50,
+                    child: CircularProgressIndicator(
+                      color: Colors.grey,
+                      strokeWidth: 5,
+                    ),
+                  ),
+                ),
+              )
+            : Container()));
 
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.black,
         body: GestureDetector(
-          onLongPress: (){
-            if(pageName == PageName.home){
+          onLongPress: () {
+            if (pageName == PageName.home) {
               speak(SpeechText.home4shake(usernameStr));
             } else if (pageName == PageName.result) {
               speak(SpeechText.result4shake(usernameStr));
