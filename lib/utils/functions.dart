@@ -13,8 +13,8 @@ Future loadModel(String _model) async {
     switch (_model) {
       case yolo:
         res = await Tflite.loadModel(
-          model: "assets/yolov2_tiny.tflite",
-          labels: "assets/yolov2_tiny.txt",
+          model: "assets/yolov2_tiny-2.tflite",
+          labels: "assets/yolov2_tiny-2.txt",
           // useGpuDelegate: true,
         );
         break;

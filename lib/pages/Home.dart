@@ -49,6 +49,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   String startDateTime;
   bool swipeStatus = false;
   String usernameStr = "";
+  int resultCounter = 0;
 
   @override
   void initState() {
@@ -73,13 +74,14 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     final preferences = await SharedPreferences.getInstance();
     String username = preferences.getString("userName") ?? "user";
     bool homeFirstStart = preferences.getBool("homeFirstStart") ?? true;
+    bool islogin = preferences.getBool("login") ?? false;
 
     setState(() {
       usernameStr = username;
     });
 
     Timer(const Duration(seconds: 2), () {
-      if (homeFirstStart) {
+      if (homeFirstStart && islogin) {
         speak(SpeechText.home4shake(username)).then((e) {
           preferences.setBool("homeFirstStart", false);
         });
@@ -97,7 +99,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           speak(SpeechText.result2shake(username));
         }
       },
-      minimumShakeCount: 3,
+      minimumShakeCount: 2,
       shakeSlopTimeMS: 500,
       shakeCountResetTime: 3000,
       shakeThresholdGravity: 2.7,
@@ -315,10 +317,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     return _recognitions.map((re) {
 
       if (re["confidenceInClass"] * 100 > 50) {
-        setState(() {
-          detectedClass = re["detectedClass"];
-          showBackdrop(re["detectedClass"]);
-        });
+        if (resultCounter < 1) {
+          setState(() {
+            resultCounter = resultCounter + 1;
+            detectedClass = re["detectedClass"];
+            showBackdrop(re["detectedClass"]);
+          });
+        }
       }
 
       return Positioned(
@@ -391,6 +396,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                       .then((val) {
                     setState(() {
                       topConfirm = true;
+                      bottomConfirm = false;
                     });
                   });
                 }
@@ -409,6 +415,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                       .then((val) {
                     setState(() {
                       bottomConfirm = true;
+                      topConfirm = false;
                     });
                   });
                 }
@@ -450,7 +457,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                         ),
                       ),
                     ),
-                    const ResultText(
+                    ResultText(
                         text: "Swipe up to answer correctly",
                         icon: Icons.arrow_upward),
                     const ResultText(
