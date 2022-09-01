@@ -253,6 +253,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         pageName = PageName.result;
         controller.pausePreview();
         startDateTime = getCurrentDateStr();
+
         speak("This is pattern " + detectedClass.toString());
       });
     } catch (e) {
@@ -312,6 +313,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     double factorY = _imageHeight; // _imageWidth * screen.width;
     Color blue = Color.fromRGBO(37, 213, 253, 1.0);
     return _recognitions.map((re) {
+
       if (re["confidenceInClass"] * 100 > 50) {
         setState(() {
           detectedClass = re["detectedClass"];

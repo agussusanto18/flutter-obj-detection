@@ -7,7 +7,6 @@ import 'package:obj_detection/utils/functions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 
-
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
@@ -18,11 +17,10 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   bool isLogin = true;
   String startDateTime;
   ApiServices apiServices;
-
 
   @override
   void initState() {
@@ -30,7 +28,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
     apiServices = ApiServices();
     checkLoginStatus();
 
-    setState((){
+    setState(() {
       startDateTime = getCurrentDateStr();
     });
 
@@ -41,30 +39,29 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver{
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
 
-    if(state == AppLifecycleState.inactive){
+    if (state == AppLifecycleState.inactive) {
       recordDuration(getCurrentDateStr());
     } else if (state == AppLifecycleState.resumed) {
-      setState((){
+      setState(() {
         startDateTime = getCurrentDateStr();
       });
     }
   }
 
-
-  Future recordDuration(String endDateTime) async{
+  Future recordDuration(String endDateTime) async {
     final preferences = await SharedPreferences.getInstance();
     int userId = preferences.getInt("userId");
 
-    await apiServices.duration(startDateTime, endDateTime, "Home",  userId.toString(), onSuccess: (data){}, onError: (message){
+    await apiServices.duration(
+        startDateTime, endDateTime, "Home", userId.toString(),
+        onSuccess: (data) {}, onError: (message) {
       showSnackBar(context, "Failed to record duration", Colors.redAccent);
     });
   }
 
-
-
   checkLoginStatus() async {
     final preferences = await SharedPreferences.getInstance();
-    setState((){
+    setState(() {
       isLogin = preferences.getBool("login") ?? false;
     });
   }
