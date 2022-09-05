@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:holding_gesture/holding_gesture.dart';
 import 'package:obj_detection/enums.dart';
+import 'package:obj_detection/pages/components/ResultOverlay.dart';
 import 'package:obj_detection/pages/components/ResultText.dart';
 import 'package:obj_detection/utils/Strings.dart';
 import 'package:obj_detection/utils/constants.dart';
@@ -31,7 +32,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   final FlutterTts tts = FlutterTts();
   List<CameraDescription> cameras;
   List _recognitions;
-  String _model = yolo;
+  final String _model = yolo;
   double _imageHeight;
   double _imageWidth;
   CameraImage img;
@@ -144,14 +145,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
   Future processFrame() async {
-    switch (_model) {
-      case yolo:
-        await startObjectDetectionUsingYolo();
-        break;
-      case ssd:
-        await startObjectDetectionUsingSSD();
-        break;
-    }
+    await startObjectDetectionUsingYolo();
   }
 
   runModelOnFrame() async {
@@ -174,32 +168,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     setState(() {
       img;
     });
-  }
-
-  startObjectDetectionUsingSSD() async {
-    if (img != null) {
-      {
-        _imageWidth = img.width + 0.0;
-        _imageHeight = img.height + 0.0;
-        _recognitions = await Tflite.detectObjectOnFrame(
-          bytesList: img.planes.map((plane) {
-            return plane.bytes;
-          }).toList(),
-          imageHeight: img.height,
-          imageWidth: img.width,
-          threshold: 0.4,
-          imageMean: 127.5,
-          imageStd: 127.5,
-          numResultsPerClass: 1,
-          // defaults to 0.1
-        );
-        isBusy = false;
-      }
-      print(_recognitions.length);
-      setState(() {
-        img;
-      });
-    }
   }
 
   startObjectDetectionUsingYolo() async {
@@ -275,6 +243,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       topConfirm = false;
       pageName = PageName.home;
       controller.resumePreview();
+      resultCounter = 0;
     });
   }
 
@@ -313,7 +282,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     if (_imageHeight == null || _imageWidth == null) return [];
     double factorX = screen.width;
     double factorY = _imageHeight; // _imageWidth * screen.width;
-    Color blue = Color.fromRGBO(37, 213, 253, 1.0);
+    Color blue = const Color.fromRGBO(37, 213, 253, 1.0);
     return _recognitions.map((re) {
 
       if (re["confidenceInClass"] * 100 > 50) {
@@ -360,6 +329,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     Size size = MediaQuery.of(context).size;
     List<Widget> stackChildren = [];
 
+    //--------------- Camera Preview in Home Page ---------------
     stackChildren.add(Positioned(
         top: 0.0,
         left: 0.0,
@@ -368,7 +338,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         child: Container(
           height: size.height,
           child: (!controller.value.isInitialized)
-              ? new Container()
+              ? Container()
               : AspectRatio(
                   aspectRatio: controller.value.aspectRatio,
                   child: CameraPreview(controller),
@@ -379,6 +349,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       stackChildren.addAll(renderBoxes(size));
     }
 
+    //--------------- Result Page Overlay ---------------
     stackChildren.add(Positioned(
         top: 0.0,
         left: 0.0,
@@ -392,7 +363,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                   hideBackdrop();
                   speak("Thank you");
                 } else {
-                  speak("are you sure you answered correctly? if yes, please swipe up again")
+                  speak(AppText.swipeUpConfirm)
                       .then((val) {
                     setState(() {
                       topConfirm = true;
@@ -404,14 +375,14 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               },
               onSwipeDown: () {
                 if (bottomConfirm) {
-                  speak("please wait, we will provide material recommendations")
+                  speak(AppText.swipeDownFinal)
                       .then((val) {
                     setState(() {
                       bottomConfirm = false;
                     });
                   });
                 } else {
-                  speak("did you answer wrong? swipe down again to confirm")
+                  speak(AppText.swipeDownConfirm)
                       .then((val) {
                     setState(() {
                       bottomConfirm = true;
@@ -433,46 +404,12 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                   countAction("swipe_right");
                 });
               },
-              child: Container(
-                color: Colors.black.withOpacity(0.6),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(30),
-                      child: Container(
-                        width: 70,
-                        height: 70,
-                        decoration: BoxDecoration(
-                            border: Border.all(
-                                color: Colors.white.withOpacity(0.3)),
-                            borderRadius: BorderRadius.circular(50)),
-                        child: Center(
-                          child: Text(
-                            detectedClass,
-                            style: TextStyle(
-                                fontSize: 30,
-                                color: Colors.white.withOpacity(0.3)),
-                          ),
-                        ),
-                      ),
-                    ),
-                    ResultText(
-                        text: "Swipe up to answer correctly",
-                        icon: Icons.arrow_upward),
-                    const ResultText(
-                        text: "Swipe down to answer wrong",
-                        icon: Icons.arrow_downward),
-                    const ResultText(
-                        text: "Swipe left to repeat speech",
-                        icon: Icons.arrow_back),
-                    const ResultText(
-                        text: "Swipe right to scan", icon: Icons.arrow_forward),
-                  ],
-                ),
+              child: ResultOverlay(
+                  detectedClass: detectedClass
               ),
             ))));
 
+    //--------------- Progress bar indicator ---------------
     stackChildren.add(Positioned(
         child: (isLoading)
             ? Container(
@@ -483,7 +420,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                   child: Container(
                     width: 50,
                     height: 50,
-                    child: CircularProgressIndicator(
+                    child: const CircularProgressIndicator(
                       color: Colors.grey,
                       strokeWidth: 5,
                     ),

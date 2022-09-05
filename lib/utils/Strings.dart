@@ -1,4 +1,11 @@
+class AppText {
+  static String swipeUpConfirm = "are you sure you answered correctly? if yes, please swipe up again";
+  static String swipeDownConfirm = "did you answer wrong? swipe down again to confirm";
+  static String swipeDownFinal = "please wait, we will provide material recommendations";
+}
+
 class SpeechText {
+
   static String home2shake(){
     return "Now you are in the home page. Please hover the phone on the flashcard so I can read it for you.";
   }
