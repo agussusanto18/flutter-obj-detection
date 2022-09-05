@@ -81,6 +81,17 @@ class ApiServices {
     } else {
       onError(data['error_msg']);
     }
+  }
 
+  Future<void> wrongAnswer(String detectedClass, {void Function(dynamic data) onSuccess, void Function(String message) onError}) async{
+    var url = Uri.parse(baseUrl + "/wronganswer.php?data=" + detectedClass);
+    var response = await http.get(url);
+    var data = json.decode(response.body);
+
+    if(!data['error']) {
+      onSuccess(data['data']['message']);
+    } else {
+      onError(data['error_msg']);
+    }
   }
 }

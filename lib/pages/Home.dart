@@ -271,6 +271,24 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     });
   }
 
+  Future wrongAnswer(String detectedClass) async {
+    setState(() {
+      isLoading = true;
+    });
+
+    await apiServices.wrongAnswer(detectedClass, onSuccess: (data) {
+      Timer(const Duration(seconds: 3), () {
+        speak(data);
+      });
+    }, onError: (message) {
+      showSnackBar(context, message, Colors.redAccent);
+    });
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
   Future speak(String obj) async {
     showVibration(context);
     await tts.setLanguage("en-US");
@@ -377,8 +395,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 if (bottomConfirm) {
                   speak(AppText.swipeDownFinal)
                       .then((val) {
-                    setState(() {
-                      bottomConfirm = false;
+
+                    wrongAnswer(detectedClass).then((value) {
+                      setState(() {
+                        bottomConfirm = false;
+                      });
                     });
                   });
                 } else {
