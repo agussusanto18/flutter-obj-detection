@@ -97,7 +97,26 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         if (pageName == PageName.home) {
           speak(SpeechText.home2shake());
         } else if (pageName == PageName.result) {
-          speak(SpeechText.result2shake(username));
+          switch(detectedClass) {
+            case "0":
+              speak(SpeechText.resultShakeClass0(username));
+              break;
+            case "1":
+              speak(SpeechText.resultShakeClass1(username));
+              break;
+            case "2":
+              speak(SpeechText.resultShakeClass2(username));
+              break;
+            case "3":
+              speak(SpeechText.resultShakeClass3(username));
+              break;
+            case "4":
+              speak(SpeechText.resultShakeClass4(username));
+              break;
+            default:
+              speak(SpeechText.result2shake(username));
+              break;
+          }
         }
       },
       minimumShakeCount: 2,
@@ -295,6 +314,34 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     await tts.speak(obj);
   }
 
+  void detectedClassesCondition(String detectedClass){
+    switch(detectedClass){
+      case "0":
+        speak("There are 3 full braille");
+        break;
+      case "1":
+        speak("There are 4 braille written. The order is a full braille, an A braille, a full braille and an A braille");
+        break;
+      case "2":
+        speak("There are 4 braille written. A full braille, a B braille, a full braille and a B braille");
+        break;
+      case "3":
+        speak("There are 4 braille. A full braille, a dot number 3 braille, a full braille and a dot number 3 braille");
+        break;
+      case "4":
+        speak("There are 4 braille. A full braille, an L braille, a full braille, and an L braille");
+        break;
+    }
+  }
+
+  void speechResult(String detectedClass){
+    showBackdrop(detectedClass);
+
+    Timer(const Duration(seconds: 3), () {
+      detectedClassesCondition(detectedClass);
+    });
+  }
+
   List<Widget> renderBoxes(Size screen) {
     if (_recognitions == null) return [];
     if (_imageHeight == null || _imageWidth == null) return [];
@@ -308,7 +355,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           setState(() {
             resultCounter = resultCounter + 1;
             detectedClass = re["detectedClass"];
-            showBackdrop(re["detectedClass"]);
+            speechResult(re["detectedClass"]);
           });
         }
       }
@@ -416,6 +463,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               onSwipeLeft: () {
                 setState(() {
                   speak("This is pattern " + detectedClass);
+                  Timer(const Duration(seconds: 3), () {
+                    detectedClassesCondition(detectedClass);
+                  });
                   countAction("swipe_left");
                 });
               },

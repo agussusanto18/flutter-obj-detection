@@ -51,4 +51,60 @@ In this page, you can shake the phone 4 times or more to hear the tutorial again
 Please try those gestures! See you!
     """;
   }
+
+  static String resultShakeClass0(String name){
+    return """
+    Hi $name, now you are in the result page.
+As you have just touch, a full braille has 6 dots. 3
+dots on the left and 3 others on the right side.
+Tn this page, there are 3 of them.
+We count the dots from the up-left to the bottomleft as 1, 2, 3 dot and from the up-right to the
+bottom-right as 4, 5, 6 dot.
+It’s difficult to feel them, right?
+But trust me, you are going to be an expert if you
+keep practicing!
+Just tips, reading braille with your both left and
+right index finger will help a lot!
+Other tips, by reading them horizontally, you will
+understand the pattern more!
+Enjoy!
+    """;
+  }
+
+  static String resultShakeClass1(String name) {
+    return """
+    Hi $name,
+The full braille helps you in recognizing the next
+brille which is an A braille.
+Braille A has a dot position at number 1.
+Try to move your index finger horizontally to
+compare the dot 1 position with the full braille. Do
+not move in vertically.
+Take your time!
+    """;
+  }
+
+  static String resultShakeClass2(String name) {
+    return """
+    Hi $name,
+Braille B has dots position at number 1 and 2.
+    """;
+  }
+
+  static String resultShakeClass3(String name) {
+    return """
+    Hi $name,
+There is no alphabet which has only dot number 3.
+But this will help you in learning the next alphabet.
+It’s getting fun right!
+    """;
+  }
+
+  static String resultShakeClass4(String name) {
+    return """
+    Hi $name,
+L braille has dots number 1, 2 and 3. Those dot
+makes a left line of a braille
+    """;
+  }
 }
