@@ -338,7 +338,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   void detectedClassesCondition(String detectedClass){
     switch(detectedClass){
-      case "0":
+      /*case "0":
         speak("There are 3 full braille");
         break;
       case "1":
@@ -352,10 +352,48 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         break;
       case "4":
         speak("There are 4 braille. A full braille, an L braille, a full braille, and an L braille");
+        break;*/
+      
+      case "0":
+        speak("Ada 3 braille full");
         break;
+      case "1":
+        speak("Ada 4 braile. Urutannya adalah braille full, braile A, braile full dan braile A ");
+        break;
+      case "2":
+        speak("Ada 4 braile. Braile full, braile B, braile full dan braile B");
+        break;
+      case "3":
+        speak("Ada 4 braile. Braile full, braile titik nomor 3, braile full dan braile titik nomor 3.");
+        break;
+      case "4":
+        speak("Ada 4 braile. Braile full, braile L, braile full, dan braile L");
+        break;
+      case "5":
+        speak("Ada 4 braile. Braile full, braile K, braile full dan braile K");
+        break;
+      case "6":
+        speak("Ada 4 braile. Braile full, braile C, braile full dan braile C");
+        break;
+      case "7":
+        speak("Ada 4 braile. Braile full, braile F, braile full dan braile F");
+        break;
+      case "8":
+        speak("Ada 4 braile. Braile full, braile P, braile full dan braile P");
+        break;
+      case "9":
+        speak("Ada 4 braile. Braile full, braile I, braile full dan braile I");
+        break;
+      case "10":
+        speak("Ada 4 braile. Braile lajur kiri, braile M, braile lajur kiri dan braile M");
+        break;
+      case "11":
+        speak("Ada 4 braile. Braile lajur kiri, braile S, braile lajur kiri dan braile S");
+        break;
+      
         
       default:
-        speak("lalalala");
+        speak("Maaf, belum terdeteksi");
         break;
     }
   }
