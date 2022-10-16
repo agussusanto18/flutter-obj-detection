@@ -265,7 +265,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         controller.pausePreview();
         startDateTime = getCurrentDateStr();
 
-        speak("This is pattern " + detectedClass.toString());
+        speak(SpeechText.result(detectedClass.toString()));
       });
     } catch (e) {
       print(e);
@@ -332,7 +332,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   Future speak(String obj) async {
     showVibration(context);
-    await tts.setLanguage("en-US");
+    await tts.setLanguage(AppText.speechLanguage);
     await tts.speak(obj);
   }
 
@@ -355,45 +355,43 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         break;*/
       
       case "0":
-        speak("Ada 3 braille full");
+        speak(SpeechText.detectedClassCondition0);
         break;
       case "1":
-        speak("Ada 4 braile. Urutannya adalah braille full, braile A, braile full dan braile A ");
+        speak(SpeechText.detectedClassCondition1);
         break;
       case "2":
-        speak("Ada 4 braile. Braile full, braile B, braile full dan braile B");
+        speak(SpeechText.detectedClassCondition2);
         break;
       case "3":
-        speak("Ada 4 braile. Braile full, braile titik nomor 3, braile full dan braile titik nomor 3.");
+        speak(SpeechText.detectedClassCondition3);
         break;
       case "4":
-        speak("Ada 4 braile. Braile full, braile L, braile full, dan braile L");
+        speak(SpeechText.detectedClassCondition4);
         break;
       case "5":
-        speak("Ada 4 braile. Braile full, braile K, braile full dan braile K");
+        speak(SpeechText.detectedClassCondition5);
         break;
       case "6":
-        speak("Ada 4 braile. Braile full, braile C, braile full dan braile C");
+        speak(SpeechText.detectedClassCondition6);
         break;
       case "7":
-        speak("Ada 4 braile. Braile full, braile F, braile full dan braile F");
+        speak(SpeechText.detectedClassCondition7);
         break;
       case "8":
-        speak("Ada 4 braile. Braile full, braile P, braile full dan braile P");
+        speak(SpeechText.detectedClassCondition8);
         break;
       case "9":
-        speak("Ada 4 braile. Braile full, braile I, braile full dan braile I");
+        speak(SpeechText.detectedClassCondition9);
         break;
       case "10":
-        speak("Ada 4 braile. Braile lajur kiri, braile M, braile lajur kiri dan braile M");
+        speak(SpeechText.detectedClassCondition10);
         break;
       case "11":
-        speak("Ada 4 braile. Braile lajur kiri, braile S, braile lajur kiri dan braile S");
+        speak(SpeechText.detectedClassCondition11);
         break;
-      
-        
       default:
-        speak("Maaf, belum terdeteksi");
+        speak(SpeechText.detectedClassDefaultCondition);
         break;
     }
   }

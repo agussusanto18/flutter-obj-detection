@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:obj_detection/pages/components/ResultText.dart';
+import 'package:obj_detection/utils/Strings.dart';
 
 class ResultOverlay extends StatelessWidget {
   final String detectedClass;
@@ -32,21 +33,17 @@ class ResultOverlay extends StatelessWidget {
               ),
             ),
           ),
-          const ResultText(
-              //text: "Swipe up to answer correctly",
-              text: "Swipe atas jika jawaban benar",
+          ResultText(
+              text: AppText.overlaySwipeUp,
               icon: Icons.arrow_upward),
-          const ResultText(
-              //text: "Swipe down to answer wrong",
-              text: "Swipe bawah jika jawaban salah",
+          ResultText(
+              text: AppText.overlaySwipeDown,
               icon: Icons.arrow_downward),
-          const ResultText(
-              //text: "Swipe left to repeat speech",
-              text: "Swipe kiri untuk mengulang suara",
+          ResultText(
+              text: AppText.overlaySwipeLeft,
               icon: Icons.arrow_back),
-          const ResultText(
-              //text: "Swipe right to scan",
-              text: "Swipe kanan untuk membaca materi berikutnya",
+          ResultText(
+              text: AppText.overlaySwipeRight,
               icon: Icons.arrow_forward),
         ],
       ),

@@ -1,13 +1,46 @@
 class AppText {
+  // static String speechLanguage = "en-US";
+  // static String speechLanguage = "ja-JP";
+  static String speechLanguage = "id-ID";
+
   //static String swipeUpConfirm = "are you sure you answered correctly? if yes, please swipe up again";
   static String swipeUpConfirm = "Apakah kamu yakin menjawab benar? jika ya, swipe atas lagi";
   //static String swipeDownConfirm = "did you answer wrong? swipe down again to confirm";
   static String swipeDownConfirm = "Apakah kamu yakin menjawab salah? swipe bawah lagi untuk konfirmasi";
   //static String swipeDownFinal = "please wait, we will provide material recommendations";
   static String swipeDownFinal = "Mohon tunggu, aku akan merekomendasikan materi untuk kamu";
+
+  // static String overlaySwipeUp = "Swipe up to answer correctly";
+  // static String overlaySwipeDown = "Swipe down to answer wrong";
+  // static String overlaySwipeLeft = "Swipe left to repeat speech";
+  // static String overlaySwipeRight = "Swipe right to scan";
+
+  static String overlaySwipeUp = "Swipe atas jika jawaban benar";
+  static String overlaySwipeDown = "Swipe bawah jika jawaban salah";
+  static String overlaySwipeLeft = "Swipe kiri untuk mengulang suara";
+  static String overlaySwipeRight = "Swipe kanan untuk membaca materi berikutnya";
 }
 
 class SpeechText {
+
+  static String result(String detectedClass) {
+    // return "This is pattern " + detectedClass;
+    return "Ini adalah pola " + detectedClass;
+  }
+
+  static String detectedClassCondition0 = "Ada 3 braille full";
+  static String detectedClassCondition1 = "Ada 4 braile. Urutannya adalah braille full, braile A, braile full dan braile A";
+  static String detectedClassCondition2 = "Ada 4 braile. Braile full, braile B, braile full dan braile B";
+  static String detectedClassCondition3 = "Ada 4 braile. Braile full, braile titik nomor 3, braile full dan braile titik nomor 3.";
+  static String detectedClassCondition4 = "Ada 4 braile. Braile full, braile L, braile full, dan braile L";
+  static String detectedClassCondition5 = "Ada 4 braile. Braile full, braile K, braile full dan braile K";
+  static String detectedClassCondition6 = "Ada 4 braile. Braile full, braile C, braile full dan braile C";
+  static String detectedClassCondition7 = "Ada 4 braile. Braile full, braile F, braile full dan braile F";
+  static String detectedClassCondition8 = "Ada 4 braile. Braile full, braile P, braile full dan braile P";
+  static String detectedClassCondition9 = "Ada 4 braile. Braile full, braile I, braile full dan braile I";
+  static String detectedClassCondition10 = "Ada 4 braile. Braile lajur kiri, braile M, braile lajur kiri dan braile M";
+  static String detectedClassCondition11 = "Ada 4 braile. Braile lajur kiri, braile S, braile lajur kiri dan braile S";
+  static String detectedClassDefaultCondition = "Maaf, belum terdeteksi";
 
   static String home2shake(){
     //return "Now you are in the home page. Please hover the phone on the flashcard so I can read it for you.";
