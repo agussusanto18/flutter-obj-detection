@@ -33,16 +33,21 @@ class ResultOverlay extends StatelessWidget {
             ),
           ),
           const ResultText(
-              text: "Swipe up to answer correctly",
+              //text: "Swipe up to answer correctly",
+              text: "Swipe atas jika jawaban benar",
               icon: Icons.arrow_upward),
           const ResultText(
-              text: "Swipe down to answer wrong",
+              //text: "Swipe down to answer wrong",
+              text: "Swipe bawah jika jawaban salah",
               icon: Icons.arrow_downward),
           const ResultText(
-              text: "Swipe left to repeat speech",
+              //text: "Swipe left to repeat speech",
+              text: "Swipe kiri untuk mengulang suara",
               icon: Icons.arrow_back),
           const ResultText(
-              text: "Swipe right to scan", icon: Icons.arrow_forward),
+              //text: "Swipe right to scan",
+              text: "Swipe kanan untuk membaca materi berikutnya",
+              icon: Icons.arrow_forward),
         ],
       ),
     );
