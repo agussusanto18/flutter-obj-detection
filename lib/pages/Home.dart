@@ -113,6 +113,28 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             case "4":
               speak(SpeechText.resultShakeClass4(username));
               break;
+            case "5":
+              speak(SpeechText.resultShakeClass5(username));
+              break;
+            case "6":
+              speak(SpeechText.resultShakeClass6(username));
+              break;
+            case "7":
+              speak(SpeechText.resultShakeClass7(username));
+              break;
+            case "8":
+              speak(SpeechText.resultShakeClass8(username));
+              break;
+            case "9":
+              speak(SpeechText.resultShakeClass9(username));
+              break;
+            case "10":
+              speak(SpeechText.resultShakeClass10(username));
+              break;
+            case "11":
+              speak(SpeechText.resultShakeClass11(username));
+              break;
+              
             default:
               speak(SpeechText.result2shake(username));
               break;
@@ -331,6 +353,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       case "4":
         speak("There are 4 braille. A full braille, an L braille, a full braille, and an L braille");
         break;
+        
+      default:
+        speak("lalalala");
+        break;
     }
   }
 
@@ -426,7 +452,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               onSwipeUp: () {
                 if (topConfirm) {
                   hideBackdrop();
-                  speak("Thank you");
+                  //speak("Thank you");
+                  speak("Terimakasih");
                 } else {
                   speak(AppText.swipeUpConfirm)
                       .then((val) {
