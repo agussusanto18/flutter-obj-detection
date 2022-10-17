@@ -108,7 +108,7 @@ Selamat mencoba!
   }
 
   static String result4shake(String name){
-    return """
+    /*return """
     Hi $name, now you are in the Result page. 
 
 I will read the braille for you in this page like I’ve just done. And you can let me know whether you are correct or wrong so that I can recommend you the suitable material to learn. It is fun right? 
@@ -118,7 +118,22 @@ Swipe up the screen if you are correct in reading braille, swipe down if you are
 In this page, you can shake the phone 4 times or more to hear the tutorial again or shake 2 times to hear the explanation about the related learning material.
 
 Please try those gestures! See you!
+    """;*/
+    
+    return """
+    
+    Halo $name, kamu sekarang berada di halaman hasil.
+    
+    Aku akan membacakan braille di flashcard untuk kamu. Jadi kamu dapat mengoreksi apakah kamu telah membaca dengan benar atau belum. Jika belum benar, aku juga akan memberikan rekomendasi braille yang perlu kamu pelajari.
+    
+    Menyenangkan bukan? Selain itu, di halaman ini, ada beberapa fungsi lain, seperti swipe atas jika kamu benar dalam membaca, swipe bawah jika kamu salah dalam membaca sekaligus rekomdasi dari ku, 
+    
+    swipe kiri agar aku membaca hasilnya lagi dan swipe kanan untuk kembali ke menu awal untuk melakukan scan flashcard lagi.
+    
+    Selain itu, jika kamu kocok hp, maka akan muncul penjelasan detail tentang braille yang sedang kamu baca. Silakan dicoba fungsi-fungsinya yaa.    
+    
     """;
+    
   }
 
   static String resultShakeClass0(String name){
