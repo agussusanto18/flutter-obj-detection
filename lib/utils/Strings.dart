@@ -25,7 +25,7 @@ class SpeechText {
 
   static String result(String detectedClass) {
     // return "This is pattern " + detectedClass;
-    return "Ini adalah pola " + detectedClass;
+    // return "Ini adalah pola " + detectedClass;
   }
 
   static String detectedClassCondition0 = "Ada 3 braille full";
